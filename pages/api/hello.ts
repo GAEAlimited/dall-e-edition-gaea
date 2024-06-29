@@ -6,7 +6,7 @@ const redis = new Redis({
   token: 'AcCaAAIncDE2MTMwYWE4ODRmZTY0ZjNkODNiOTg3MjUzMzdhYWE1OXAxNDkzMDY',
 })
 
-export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<void> {
+export default async function handler(req: NextApiRequest, res: NextApiResponse): Promise<true> {
   let count = await redis.incr("counter")
   res.status(200).json({count: count})
 }
