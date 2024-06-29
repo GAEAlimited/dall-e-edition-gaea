@@ -35,7 +35,7 @@ export default function Document() {
           name="twitter:description"
           content="Generate an AI-generated image with a description."
         />
-        <meta property="og:site_name" content="dall-e-edition-gaea.vercel.app" />
+        <meta property="og:site_name" content="dalle-2.vercel.app" />
         <meta name="keywords" content="AI, text2image, dalle, dall-e, openai" />
         <meta property="og:title" content="Dall-E 2 AI Image Generator" />
         <meta name="twitter:card" content="summary_large_image" />
