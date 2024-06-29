@@ -1,7 +1,7 @@
 import { NextApiRequest, NextApiResponse } from "next";
 const QSTASH = `https://qstash.upstash.io/v1/publish/`;
 const DALL_E = "https://api.openai.com/v1/images/generations";
-const VERCEL_URL = "https://dalle-2-jade.vercel.app";
+const VERCEL_URL = "https://dall-e-edition-gaea.vercel.app/";
 
 export default async function handler(
   req: NextApiRequest,
