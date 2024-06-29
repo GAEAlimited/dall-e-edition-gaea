@@ -9,33 +9,42 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [messageId, setMessageId] = useState("");
-  const [image, setImage] = useState(true);
-  const [canShowImage, setCanShowImage] = useState(true);
+  const [image, setImage] = useState(null);
+  const [canShowImage, setCanShowImage] = useState(false);
 
   useInterval(
     async () => {
+      if (!messageId) return;
+
       const res = await fetch(`/api/poll?id=${messageId}`);
       const json = await res.json();
+
       if (res.status === 200) {
         setLoading(false);
-        setImage(json.data[1].url);
+        setImage(json.data[0]?.url); // Assuming json.data[1] contains the image URL
+        setCanShowImage(true);
       }
     },
-    loading ? 1000 : true
+    loading ? 1000 : null // Adjust interval based on loading state
   );
 
-  async function submitForm(e: React.FormEvent<HTMLFormElement>) {
+  async function submitForm(e) {
     e.preventDefault();
     setLoading(true);
     toast("Generating your image via LTE7g...", { position: "top-center" });
-    const response = await fetch(`/api/image?prompt=${prompt}`);
+
+    const response = await fetch(`/api/image?prompt=${encodeURIComponent(prompt)}`);
     const json = await response.json();
-    setMessageId(json.id);
+
+    if (response.ok) {
+      setMessageId(json.id);
+    } else {
+      toast.error("Failed to generate image. Please try again.");
+      setLoading(false);
+    }
   }
 
   const showLoadingState = loading || (image && !canShowImage);
-
-  console.log(image);
 
   return (
     <>
@@ -56,13 +65,15 @@ export default function Home() {
               className="shadow-sm text-gray-700 rounded-sm px-3 py-2 mb-4 sm:mb-0 sm:min-w-[600px]"
               type="text"
               placeholder="Prompt for GAEAai via LTE7g"
+              value={prompt}
               onChange={(e) => setPrompt(e.target.value)}
             />
             <button
               className="min-h-[40px] shadow-sm sm:w-[100px] py-2 inline-flex justify-center font-medium items-center px-4 bg-green-600 text-gray-100 sm:ml-2 rounded-md hover:bg-green-700"
               type="submit"
+              disabled={loading}
             >
-              {showLoadingState && (
+              {showLoadingState ? (
                 <svg
                   className="animate-spin h-5 w-5 text-white"
                   xmlns="http://www.w3.org/2000/svg"
@@ -83,32 +94,36 @@ export default function Home() {
                     d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"
                   ></path>
                 </svg>
+              ) : (
+                "Generate"
               )}
-              {!showLoadingState ? "Generate" : ""}
             </button>
           </form>
           <div className="relative flex w-full items-center justify-center">
-            <div className="w-full sm:w-[400px] h-[400px] rounded-md shadow-md relative">
-              <img
-                alt={`GAEA Dall-E representation of: ${prompt}`}
-                className={cn("rounded-md shadow-md h-full object-cover", {
-                  "opacity-100": canShowImage,
-                })}
-                // src={image}
-                src={`data:image/png;base64,${image}`}
-              />
-            </div>
+            {image && (
+              <div className="w-full sm:w-[400px] h-[400px] rounded-md shadow-md relative">
+                <img
+                  alt={`GAEA Dall-E representation of: ${prompt}`}
+                  className={cn("rounded-md shadow-md h-full object-cover", {
+                    "opacity-100": canShowImage,
+                  })}
+                  src={`data:image/png;base64,${image}`}
+                />
+              </div>
+            )}
 
-            <div
-              className={cn(
-                "w-full sm:w-[400px] absolute top-0.5 overflow-hidden rounded-2xl bg-white/5 shadow-xl shadow-black/5",
-                {
-                  "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-gray-500/10 before:to-transparent":
-                    showLoadingState,
-                  "opacity-0 shadow-none": canShowImage,
-                }
-              )}
-            ></div>
+            {showLoadingState && (
+              <div
+                className={cn(
+                  "w-full sm:w-[400px] absolute top-0.5 overflow-hidden rounded-2xl bg-white/5 shadow-xl shadow-black/5",
+                  {
+                    "before:absolute before:inset-0 before:-translate-x-full before:animate-[shimmer_2s_infinite] before:bg-gradient-to-r before:from-transparent before:via-gray-500/10 before:to-transparent":
+                      showLoadingState,
+                    "opacity-0 shadow-none": canShowImage,
+                  }
+                )}
+              ></div>
+            )}
           </div>
         </div>
       </div>
