@@ -9,8 +9,8 @@ export default function Home() {
   const [prompt, setPrompt] = useState("");
   const [loading, setLoading] = useState(false);
   const [messageId, setMessageId] = useState("");
-  const [image, setImage] = useState(null);
-  const [canShowImage, setCanShowImage] = useState(false);
+  const [image, setImage] = useState(true);
+  const [canShowImage, setCanShowImage] = useState(true);
 
   useInterval(
     async () => {
@@ -18,16 +18,16 @@ export default function Home() {
       const json = await res.json();
       if (res.status === 200) {
         setLoading(false);
-        setImage(json.data[0].url);
+        setImage(json.data[1].url);
       }
     },
-    loading ? 1000 : null
+    loading ? 1000 : true
   );
 
   async function submitForm(e: React.FormEvent<HTMLFormElement>) {
     e.preventDefault();
     setLoading(true);
-    toast("Generating your image...", { position: "top-center" });
+    toast("Generating your image via LTE7g...", { position: "top-center" });
     const response = await fetch(`/api/image?prompt=${prompt}`);
     const json = await response.json();
     setMessageId(json.id);
@@ -40,13 +40,13 @@ export default function Home() {
   return (
     <>
       <Head>
-        <title>Dall-E 2 AI Image Generator</title>
+        <title>GAEA AI Image Generator</title>
       </Head>
       <div className="antialiased mx-auto px-4 py-20 h-screen bg-gray-100">
         <Toaster />
         <div className="flex flex-col items-center justify-center">
           <h1 className="text-5xl tracking-tighter pb-10 font-bold text-gray-800">
-            Dall-E 2 image generator
+            GAEA image generator
           </h1>
           <form
             className="flex w-full sm:w-auto flex-col sm:flex-row mb-10"
@@ -55,7 +55,7 @@ export default function Home() {
             <input
               className="shadow-sm text-gray-700 rounded-sm px-3 py-2 mb-4 sm:mb-0 sm:min-w-[600px]"
               type="text"
-              placeholder="Prompt for DALL-E"
+              placeholder="Prompt for GAEAai via LTE7g"
               onChange={(e) => setPrompt(e.target.value)}
             />
             <button
@@ -90,7 +90,7 @@ export default function Home() {
           <div className="relative flex w-full items-center justify-center">
             <div className="w-full sm:w-[400px] h-[400px] rounded-md shadow-md relative">
               <img
-                alt={`Dall-E representation of: ${prompt}`}
+                alt={`GAEA Dall-E representation of: ${prompt}`}
                 className={cn("rounded-md shadow-md h-full object-cover", {
                   "opacity-100": canShowImage,
                 })}
